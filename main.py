@@ -19,14 +19,14 @@ while True:
                         ]
                     )
     ]
-    selectedoption = inquirer.prompt(options)
-    action = selectedoption['action']
+    action = inquirer.prompt(options)['action']
+    
     # TODO: Add menu options to select start and end cities and algorithm
     match action:
         case 1:
             selectedMap = functions.handle_select_map_file()
         case 2:
-            functions.handle_calculate_route(selectedMap['data'], "Aveiro", "Faro", "dfs")
+            functions.handle_calculate_route(selectedMap['data'])
         case 3:
             functions.printMapData(selectedMap['data'])
         case 0:

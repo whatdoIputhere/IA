@@ -2,7 +2,7 @@ import os
 import inquirer
 import pandas as pd
 folder_path = "maps"
-
+algorithms = ["lp", "cu", "pp", "pl", "ap","ps","a*"]
 def clearScreen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
@@ -66,12 +66,44 @@ def handle_select_map_file():
              
     return {"filename": selectedfile, "data": graph}
 
-def dfs():
-    return ""
+def lp(data, start, end):
+    path = [start]
+    for city in data:
+        if city == start:
+            for connection in data[city]:
+                print(connection)
+    input()
+    return path
 
-def handle_calculate_route(data, start, end, algorithm):
-    if algorithm == "dfs":
-        path = dfs(data, start, end)
+def handle_calculate_route(data):
+    clearScreen()
+    cityoptions = [
+        inquirer.List('city',
+                      message="Select start city",
+                      choices=data.keys(),)
+    ]
+    selectedStartcity = inquirer.prompt(cityoptions)['city']
+    clearScreen()
+    print(f"Selected start city: {selectedStartcity}")
+    cityoptions = [
+        inquirer.List('city',
+                      message="Select end city",
+                      choices=[city for city in data.keys() if city != selectedStartcity],)
+    ]
+    selectedEndcity = inquirer.prompt(cityoptions)['city']
+    
+    algorithmoptions = [
+        inquirer.List('algorithm',
+                      message="Select algorithm",
+                      choices=algorithms,)
+    ]
+    clearScreen()
+    print(f"Selected start city: {selectedStartcity}")
+    print(f"Selected end city: {selectedEndcity}")
+    selectedalgorithm = inquirer.prompt(algorithmoptions)['algorithm']
+    
+    if selectedalgorithm == "lp":
+        path = lp(data, selectedStartcity, selectedStartcity)
     print(path)
     input("\nPress Enter to return...")
     
