@@ -1,7 +1,7 @@
 import inquirer
 import functions
 #pip install pandas, inquirer, openpyxl
-selectedMap = {"filename": None, "data": None}
+selectedMap = {"filename": None, "cities": None}
 while True:
     functions.clearScreen()
     options = [
@@ -18,16 +18,19 @@ while True:
                         ("Exit",0)
                         ]
                     )
-    ]
+    ]         
+    
     action = inquirer.prompt(options)['action']
     
     # TODO: Add menu options to select start and end cities and algorithm
     match action:
         case 1:
             selectedMap = functions.handle_select_map_file()
+            print(selectedMap)
+            input()
         case 2:
-            functions.handle_calculate_route(selectedMap['data'])
+            functions.handle_calculate_route(selectedMap['cities'])
         case 3:
-            functions.printMapData(selectedMap['data'])
+            functions.printMapData(selectedMap['cities'])
         case 0:
             break
