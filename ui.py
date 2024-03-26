@@ -12,7 +12,6 @@ algorithms = ['DFS','A*','Greedy Search', 'Uniform Cost']
 default_location = getGeolocation("Portugal", cached_locations)
 
 
-install_requirements()
 root = Tk()
 root.geometry("1280x720")
 root.title("Projeto IA")
@@ -127,4 +126,5 @@ def loadMap():
     map_view.pack(fill=BOTH, expand=True)
     return map_view
 
-root.mainloop()
+def loadUI():
+    root.mainloop()
