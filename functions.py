@@ -5,6 +5,7 @@ from geopy.geocoders import Photon
 from city import City
 folder_path = "maps"
 algorithms = ["lp", "cu", "pp", "pl", "ap","ps","a*"]
+import haversine as hs
 
 def clearScreen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -32,11 +33,17 @@ def parseTextFile(file,cached_locations):
                         city = cities[index]
             
             for connection in connections:
-                connection_city = connection.split('(')[0].strip()
-                connection_distance = connection.split('(')[1].split(')')[0].strip()
+                if '(' in connection:
+                    connection_city = connection.split('(')[0].strip()
+                    connection_distance = connection.split('(')[1].split(')')[0].strip()
+                    connection_city_location = getGeolocation(connection_city, cached_locations, countryname)
+                else:
+                    connection_city = connection.strip()
+                    connection_city_location = getGeolocation(connection_city, cached_locations, countryname)
+                    connection_distance = round(hs.haversine(city.getLocation(), connection_city_location))
+                    
                 city.addConnection({"name": connection_city, "distance": connection_distance})
                 if not any(connection_city == city.getName() for city in cities):
-                    connection_city_location = getGeolocation(connection_city, cached_locations, countryname)
                     connectionCity = City(connection_city,connection_city_location)
                     connectionCity.addConnection({"name": cityName, "distance": connection_distance})
                     cities.append(connectionCity)
@@ -44,32 +51,53 @@ def parseTextFile(file,cached_locations):
                     for index, c in enumerate(cities):
                         if c.getName() == connection_city:                        
                             cities[index].addConnection({"name": cityName, "distance": connection_distance})
+    return countryname, cities
+
+   
+def parseExcelFile(file, cached_locations):
+    cities = []
+    countryname = ""
+    data = pd.read_excel(file, header=None)
         
-    print(f"Number of cities: {len(cities)}")
-    for city in cities:
-        city.printConnections()
+    for index, row in data.iterrows():
+        if index == 0:
+            countryname = row[0]
+            continue
+        
+        cityName = row[0]
+        connections = row[1:]
+        
+        if not any(cityName == city.getName() for city in cities):
+            cityLocation = getGeolocation(cityName, cached_locations, countryname)
+            city = City(cityName, cityLocation)
+            cities.append(city)
+        else:
+            for index, c in enumerate(cities):
+                if c.getName() == cityName:
+                    city = cities[index]
+        
+        for i, connection in enumerate(connections):
+            if pd.notnull(connection):
+                if '(' in connection:
+                    connection_city = connection.split('(')[0].strip()
+                    connection_distance = connection.split('(')[1].split(')')[0].strip()
+                    connection_city_location = getGeolocation(connection_city, cached_locations, countryname)
+                else:
+                    connection_city = connection.strip()
+                    connection_city_location = getGeolocation(connection_city, cached_locations, countryname)
+                    connection_distance = round(hs.haversine(city.getLocation(), connection_city_location))
+                    
+                city.addConnection({"name": connection_city, "distance": connection_distance})
+                if not any(connection_city == city.getName() for city in cities):
+                    connectionCity = City(connection_city,connection_city_location)
+                    connectionCity.addConnection({"name": cityName, "distance": connection_distance})
+                    cities.append(connectionCity)
+                else:
+                    for index, c in enumerate(cities):
+                        if c.getName() == connection_city:                        
+                            cities[index].addConnection({"name": cityName, "distance": connection_distance})
     return countryname, cities
     
-def parseExcelFile(file):
-    filepath = folder_path+'\\'+file
-    
-    data = pd.read_excel(filepath,header=None)
-    graph = {}
-    for index, row in data.iterrows():
-        city, *connections = row.values
-        if city not in graph:
-            graph[city] = []
-        for connection in connections:
-            if pd.notna(connection):
-                connection_city = connection.split('(')[0].strip()
-                connection_distance = connection.split('(')[1].split(')')[0].strip()
-                graph[city].append({connection_city: connection_distance})
-                if connection_city not in graph:
-                    graph[connection_city] = [{city: connection_distance}]
-                else:
-                    graph[connection_city].append({city: connection_distance})
-        
-    return graph
     
     
 def loadCachedLocations():

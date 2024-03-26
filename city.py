@@ -14,6 +14,9 @@ class City:
     def getConnections(self):
         return self.connections
     
+    def getLocation(self):
+        return (self.latitude, self.longitude)
+    
     def printConnections(self):
         print(f"{self.name} has {len(self.connections)} connections.")
         for connection in self.connections:

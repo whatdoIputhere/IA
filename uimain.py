@@ -21,8 +21,11 @@ def select_map_file():
     global city_names 
     global cities
     try:
-        selectedFile = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"), ("Excel files", "*.xlsx"), ("CSV files", "*.csv")])
-        country_name, new_cities = parseTextFile(selectedFile, cached_locations)
+        selectedFile = filedialog.askopenfilename(filetypes=[("Text files", "*.txt"), ("Excel files", "*.xlsx"), ("CSV files", "*.csv")])        
+        if selectedFile.endswith('.xlsx'):
+            country_name, new_cities = parseExcelFile(selectedFile, cached_locations)
+        else:
+            country_name, new_cities = parseTextFile(selectedFile, cached_locations)
         city_names = sorted([city.name for city in new_cities])
         cities = new_cities
         newlocations = getGeolocation(country_name, cached_locations)
@@ -30,6 +33,9 @@ def select_map_file():
         map_view.set_position(newlocations[0], newlocations[1])
         map_view.set_zoom(7)
         populateCities()
+        print(f"Number of cities: {len(cities)}")
+        for city in cities:
+            city.printConnections()
     except Exception as e:
         print("Error:", str(e))
 
