@@ -3,21 +3,37 @@ from functions import *
 import tkintermapview
 from tkinter import filedialog
 import tkinter.ttk as ttk
+from algorithms import *
 
 cached_locations = loadCachedLocations()
 selectedFile = None
 cities = ()
 city_names = ()
 algorithms = ['DFS','A*','Greedy Search', 'Uniform Cost']
-default_location = getGeolocation("Portugal", cached_locations)
-
 
 root = Tk()
-root.geometry("1280x720")
+window_width , window_height = 1280, 720
+screen_width, screen_height = root.winfo_screenwidth(), root.winfo_screenheight()
+x, y = int((screen_width/2) - (window_width/2)), int((screen_height/2) - (window_height/2))
+root.geometry(f"{window_width}x{window_height}+{x}+{y}")
 root.title("Projeto IA")
 root.configure(background='#DDD')
 left_frame = Frame(root, width=200)
 left_frame.pack(side=LEFT, fill=Y, ipadx=15)
+
+def handle_calculate_route():
+    start_city = start_city_combobox.get()
+    end_city = end_city_combobox.get()
+    algorithm = algorithm_combobox.get()
+
+    if algorithm == "DFS":
+        depth_search_first(cities, start_city, end_city)
+    elif algorithm == "A*":
+        a_star(cities, start_city, end_city)
+    elif algorithm == "Greedy Search":
+        greedy_search(cities, start_city, end_city)
+    elif algorithm == "Uniform Cost":
+        uniform_cost(cities, start_city, end_city)
 
 def select_map_file():
     global selectedFile
@@ -33,11 +49,10 @@ def select_map_file():
         city_names = sorted([city.name for city in new_cities])
         cities = new_cities
         countryLocation = getGeolocation(country_name, cached_locations)        
-        
         try:
             map_view.set_position(countryLocation[0], countryLocation[1])
         except:
-            map_view = loadMap()
+            map_view = loadMap(countryLocation)
 
         clearMarkersAndPaths()
         populateCities()
@@ -107,21 +122,21 @@ algorithm_combobox.set(algorithms[0])
 algorithm_combobox.pack()
 
 calculate_route_button = Button(left_frame, text="Calculate Route", 
-                                command=lambda: handle_calculate_route(cities, start_city_combobox.get(), end_city_combobox.get()))
+                                command=lambda: handle_calculate_route())
 calculate_route_button.pack(pady=(10,0))
 
 add_markers_and_distances_button = Button(left_frame, text="Add Markers and Distances", command=lambda: addPathsToMap())
-add_markers_and_distances_button.pack()
+add_markers_and_distances_button.pack(pady=(10,0))
 
 select_map_message = Label(text="Select a file to load the map.", font=("Arial", 16),foreground="#666",background="#DDD")
 select_map_message.pack()
 select_map_message.place_configure(relx=0.5, rely=0.5, anchor=CENTER)
 
 
-def loadMap():
+def loadMap(countryLocation):
     select_map_message.pack_forget()
     map_view = tkintermapview.TkinterMapView(root, width=1000, height=700)
-    map_view.set_position(default_location[0], default_location[1])
+    map_view.set_position(countryLocation[0], countryLocation[1])
     map_view.set_zoom(7)
     map_view.pack(fill=BOTH, expand=True)
     return map_view
