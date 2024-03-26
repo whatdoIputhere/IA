@@ -9,13 +9,12 @@ algorithms = ["lp", "cu", "pp", "pl", "ap","ps","a*"]
 def clearScreen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def parseTextFile(file):
-    filepath = file
+def parseTextFile(file,cached_locations):
     cities = []
     countryname = ""
-    with open(filepath, 'r', encoding='utf-8') as f:
+    
+    with open(file, 'r', encoding='utf-8') as f:
         lines = f.readlines()
-        graph = {}
         
         for line in lines:
             if line == lines[0]:
@@ -23,25 +22,32 @@ def parseTextFile(file):
                 continue
             
             cityName, *connections = line.split(',')
-            
-            if not any(cityName == city.name for city in cities):
-                city = City(cityName)
+            if(not any(cityName == city.getName() for city in cities)):
+                cityLocation = getGeolocation(cityName, cached_locations, countryname)
+                city = City(cityName, cityLocation)
                 cities.append(city)
+            else:
+                for index, c in enumerate(cities):
+                    if c.getName() == cityName:
+                        city = cities[index]
             
             for connection in connections:
                 connection_city = connection.split('(')[0].strip()
                 connection_distance = connection.split('(')[1].split(')')[0].strip()
                 city.addConnection({"name": connection_city, "distance": connection_distance})
-                if not any(connection_city == city.name for city in cities):
-                    connectionCity = City(connection_city)
+                if not any(connection_city == city.getName() for city in cities):
+                    connection_city_location = getGeolocation(connection_city, cached_locations, countryname)
+                    connectionCity = City(connection_city,connection_city_location)
                     connectionCity.addConnection({"name": cityName, "distance": connection_distance})
                     cities.append(connectionCity)
                 else:
-                    for c in cities:
-                        if c.name == connection_city:
-                            c.addConnection({"name": cityName, "distance": connection_distance})                        
-            
-    # input("Press Enter to continue...")
+                    for index, c in enumerate(cities):
+                        if c.getName() == connection_city:                        
+                            cities[index].addConnection({"name": cityName, "distance": connection_distance})
+        
+    print(f"Number of cities: {len(cities)}")
+    for city in cities:
+        city.printConnections()
     return countryname, cities
     
 def parseExcelFile(file):
@@ -64,73 +70,10 @@ def parseExcelFile(file):
                     graph[connection_city].append({city: connection_distance})
         
     return graph
-
-def handle_select_map_file():
-    files = [f for f in os.listdir(folder_path) if f.endswith(('.xlsx', '.txt', '.csv'))]
-    fileoptions = [
-        inquirer.List('mapfile',
-                      message="Select a map file",
-                      choices=files,)
-    ]
-    selectedfile = inquirer.prompt(fileoptions)['mapfile']
-        
-    if selectedfile.endswith('.xlsx'):
-        graph = parseExcelFile(selectedfile)
-    elif selectedfile.endswith('.txt') or selectedfile.endswith('.csv'):
-        cities = parseTextFile(selectedfile)
-             
-    return {"filename": selectedfile, "cities": cities}
-
-def lp(data, start, end):
-    path = [start]
-    for city in data:
-        if city == start:
-            for connection in data[city]:
-                pass
-    input()
-    return path
-
-def handle_calculate_route(data):
-    clearScreen()
-    cityoptions = [
-        inquirer.List('city',
-                      message="Select start city",
-                      choices=data.keys(),)
-    ]
-    selectedStartcity = inquirer.prompt(cityoptions)['city']
-    clearScreen()
-    print(f"Selected start city: {selectedStartcity}")
-    cityoptions = [
-        inquirer.List('city',
-                      message="Select end city",
-                      choices=[city for city in data.keys() if city != selectedStartcity],)
-    ]
-    selectedEndcity = inquirer.prompt(cityoptions)['city']
-    
-    algorithmoptions = [
-        inquirer.List('algorithm',
-                      message="Select algorithm",
-                      choices=algorithms,)
-    ]
-    clearScreen()
-    print(f"Selected start city: {selectedStartcity}")
-    print(f"Selected end city: {selectedEndcity}")
-    selectedalgorithm = inquirer.prompt(algorithmoptions)['algorithm']
-    
-    if selectedalgorithm == "lp":
-        path = lp(data, selectedStartcity, selectedStartcity)
-    print(path)
-    input("\nPress Enter to return...")
-    
-def printMapData(cities):
-    clearScreen()
-    for city in cities:
-        print(city.__str__())
-    input("\nPress Enter to return...")
     
     
 def loadCachedLocations():
-    print("Loading cached locations...")
+    #print("Loading cached locations...")
     cached_locations = []
     open("cached_locations.txt", "a").close()
     with open("cached_locations.txt", "r", encoding="utf-8") as file:
@@ -139,14 +82,14 @@ def loadCachedLocations():
             cached_locations.append({"location": location, "latitude": float(latitude), "longitude": float(longitude)})
     return cached_locations
 
-def getGeolocation(location, cached_locations):
+def getGeolocation(location, cached_locations, country=""):
     if location in [loc["location"] for loc in cached_locations]:
         print(f"Using cached location for {location}.")
         cached_location = next((loc for loc in cached_locations if loc["location"] == location), None)
         return [cached_location["latitude"], cached_location["longitude"]]
     print(f"Geolocating {location}...")
     geolocator = Photon(user_agent="ia202324")
-    geolocation = geolocator.geocode(location)
+    geolocation = geolocator.geocode(location + ", " + country if country != "" else location)
     cached_locations.append({"location": location, "latitude": geolocation.latitude, "longitude": geolocation.longitude})
     with open("cached_locations.txt", "a", encoding="utf-8") as file:
         file.write(f"{location},{geolocation.latitude},{geolocation.longitude}\n")
