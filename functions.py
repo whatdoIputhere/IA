@@ -1,8 +1,10 @@
 import os
-import inquirer
 import pandas as pd
 from geopy.geocoders import Photon
 from city import City
+import pkg_resources
+import subprocess
+import sys
 folder_path = "maps"
 algorithms = ["lp", "cu", "pp", "pl", "ap","ps","a*"]
 import haversine as hs
@@ -122,3 +124,21 @@ def getGeolocation(location, cached_locations, country=""):
     with open("cached_locations.txt", "a", encoding="utf-8") as file:
         file.write(f"{location},{geolocation.latitude},{geolocation.longitude}\n")
     return [geolocation.latitude, geolocation.longitude]
+
+
+def is_installed(package):
+    try:
+        pkg_resources.get_distribution(package)
+        return True
+    except pkg_resources.DistributionNotFound:
+        return False
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+
+def install_requirements():
+    with open('requirements.txt', 'r') as f:
+        for line in f:
+            package = line.strip()
+            if not is_installed(package):
+                install(package)
