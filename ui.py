@@ -26,8 +26,8 @@ def handle_calculate_route():
     end_city = end_city_combobox.get()
     algorithm = algorithm_combobox.get()
 
-    if algorithm == "DFS":
-        depth_search_first(cities, start_city, end_city)
+    if algorithm == "Depth-Limited Search":
+        depth_limited_search(cities, start_city, end_city)
     elif algorithm == "A*":
         a_star(cities, start_city, end_city)
     elif algorithm == "Greedy Search":
