@@ -56,11 +56,9 @@ def parseTextFile(file,cached_locations):
             for index, c in enumerate(cities):
                 if c.getName() == cityname:
                     cities[index].setStraightDistanceToFaro(distance.strip())
-    for city in cities:
-        city.__str__()
     return countryname, cities
 
-   
+
 def parseExcelFile(file, cached_locations):
     cities = []
     countryname = ""
@@ -116,10 +114,10 @@ def loadCachedLocations():
 
 def getGeolocation(location, cached_locations, country=""):
     if location in [loc["location"] for loc in cached_locations]:
-        print(f"Using cached location for {location}.")
+        #print(f"Using cached location for {location}.")
         cached_location = next((loc for loc in cached_locations if loc["location"] == location), None)
         return [cached_location["latitude"], cached_location["longitude"]]
-    print(f"Geolocating {location}...")
+    #print(f"Geolocating {location}...")
     geolocator = Photon(user_agent="ia202324")
     geolocation = geolocator.geocode(location + ", " + country if country != "" else location)
     cached_locations.append({"location": location, "latitude": geolocation.latitude, "longitude": geolocation.longitude})

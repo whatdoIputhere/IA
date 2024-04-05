@@ -12,6 +12,8 @@ city_names = ()
 algorithms = ['DLS','A*','Greedy Search', 'Uniform Cost']
 
 root = Tk()
+root.tk.call('source', 'style/forest-light.tcl')
+ttk.Style().theme_use('forest-light')
 window_width , window_height = 1280, 720
 screen_width, screen_height = root.winfo_screenwidth(), root.winfo_screenheight()
 x, y = int((screen_width/2) - (window_width/2)), int((screen_height/2) - (window_height/2))
@@ -72,6 +74,9 @@ def populateCities(event=None):
         start_city_combobox.state(["!disabled"])
         end_city_combobox.state(["!disabled"])
         algorithm_combobox.state(["!disabled"])
+        calculate_route_button.state(["!disabled"])
+        add_markers_and_distances_button.state(["!disabled"])
+        clear_markers_and_distances_button.state(["!disabled"])
     else:
         widget = event.widget
 
@@ -91,9 +96,12 @@ def addMarkersToAllLocations():
         map_view.set_marker(location[0], location[1], city)
         
 def displayCalculatedPath(pathCost):
+    clearMarkersAndPaths()
+    path_list.option_clear()
     path = pathCost[0]
     cost = pathCost[1]
     for city in path:
+        path_list.insert(END, city)
         location = getGeolocation(city, cached_locations)
         map_view.set_marker(location[0], location[1], city)
         if(city != path[0]):
@@ -109,38 +117,42 @@ def addPathsToMap():
             path = [(city.latitude, city.longitude), (connection.latitude, connection.longitude)]
             map_view.set_path(path)
             
-select_map_file_button = Button(left_frame, text="Select Map File", command=select_map_file)
+select_map_file_button = ttk.Button(left_frame, text="Select Map File", command=select_map_file, width=20
+                                    ,style='Accent.TButton')
 select_map_file_button.pack(pady=(20,0))
 
-start_city_label = Label(left_frame, text="Start City:")
+start_city_label = Label(left_frame, text="Start City:", width=20)
 start_city_label.pack(pady=(10,0))
 start_city_combobox = ttk.Combobox(left_frame, values=['Select map first'], width=20, height=20, state="disabled")
 start_city_combobox.set(start_city_combobox['values'][0])
 start_city_combobox.bind("<<ComboboxSelected>>", populateCities)
 start_city_combobox.pack()
 
-end_city_label = Label(left_frame, text="End City:")
+end_city_label = Label(left_frame, text="End City:", width=20)
 end_city_label.pack(pady=(10,0))
 end_city_combobox = ttk.Combobox(left_frame, values=['Select map first'], width=20, height=20, state="disabled")
 end_city_combobox.set(end_city_combobox['values'][0])
 end_city_combobox.bind("<<ComboboxSelected>>", populateCities)
 end_city_combobox.pack()
 
-algorithm_label = Label(left_frame, text="Algorithm:")
+algorithm_label = Label(left_frame, text="Algorithm:", width=20)
 algorithm_label.pack(pady=(10,0))
-algorithm_combobox = ttk.Combobox(left_frame, values=algorithms, state="disabled")
+algorithm_combobox = ttk.Combobox(left_frame, values=algorithms, state="disabled", width=20)
 algorithm_combobox.set(algorithms[0])
 algorithm_combobox.pack()
 
-calculate_route_button = Button(left_frame, text="Calculate Route", 
-                                command=lambda: handle_calculate_route())
+calculate_route_button = ttk.Button(left_frame, text="Calculate Route", 
+                                command=lambda: handle_calculate_route(), state="disabled", width=25)
 calculate_route_button.pack(pady=(10,0))
 
-add_markers_and_distances_button = Button(left_frame, text="Add Markers and Paths", command=lambda: addPathsToMap())
+add_markers_and_distances_button = ttk.Button(left_frame, text="Add Markers and Paths",state="disabled", command=lambda: addPathsToMap(), width=25)
 add_markers_and_distances_button.pack(pady=(10,0))
 
-clear_markers_and_distances_button = Button(left_frame, text="Clear Markers", command=lambda: clearMarkersAndPaths())
+clear_markers_and_distances_button = ttk.Button(left_frame, text="Clear Markers",state="disabled", command=lambda: clearMarkersAndPaths(), width=25)
 clear_markers_and_distances_button.pack(pady=(10,0))
+
+path_list = Listbox(left_frame, width=30, height=10)
+path_list.pack(pady=(10,0))
 
 select_map_message = Label(text="Select a file to load the map.", font=("Arial", 16),foreground="#666",background="#DDD")
 select_map_message.pack()

@@ -15,7 +15,10 @@ def greedy_search(cities, start_city, end_city, greedypath = [], greedycost = []
         if city.getName() == end_city.getName():
             greedypath.append(city.getName())
             greedycost.append(connection["distance"])
-            return greedypath, greedycost
+            result = (greedypath.copy(), greedycost.copy()) 
+            greedycost.clear()
+            greedypath.clear()
+            return result
         if int(city.getStraightDistanceToFaro()) < int(minHeuristic):
             minHeuristic = city.getStraightDistanceToFaro()
             nextcity = city
@@ -24,7 +27,6 @@ def greedy_search(cities, start_city, end_city, greedypath = [], greedycost = []
         return greedy_search(cities, nextcity, end_city, greedypath, greedycost)
     except Exception as e:
         return [], []
-    
-    
+
 def a_star(cities, start_city, end_city):
     print("A* Search")
