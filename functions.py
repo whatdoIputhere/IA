@@ -48,6 +48,16 @@ def parseTextFile(file,cached_locations):
                     for index, c in enumerate(cities):
                         if c.getName() == connection_city:                        
                             cities[index].addConnection({"name": cityName, "distance": connection_distance})
+    
+    with open("maps/distancetofaro.txt", "r", encoding="utf-8") as file:
+        lines = file.readlines()
+        for line in lines:
+            cityname, distance = line.split(',')
+            for index, c in enumerate(cities):
+                if c.getName() == cityname:
+                    cities[index].setStraightDistanceToFaro(distance.strip())
+    for city in cities:
+        city.__str__()
     return countryname, cities
 
    
@@ -116,3 +126,8 @@ def getGeolocation(location, cached_locations, country=""):
     with open("cached_locations.txt", "a", encoding="utf-8") as file:
         file.write(f"{location},{geolocation.latitude},{geolocation.longitude}\n")
     return [geolocation.latitude, geolocation.longitude]
+
+def getHeuristic(start_city,end_city):   
+    if(end_city.getName() == "Faro"):
+        return start_city.getStraightDistanceToFaro()
+    return hs.haversine(start_city.getLocation(), end_city.getLocation())

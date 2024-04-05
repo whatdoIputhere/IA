@@ -25,15 +25,16 @@ def handle_calculate_route():
     start_city = start_city_combobox.get()
     end_city = end_city_combobox.get()
     algorithm = algorithm_combobox.get()
-
+    start_city = [city for city in cities if city.getName() == start_city][0]
+    end_city = [city for city in cities if city.getName() == end_city][0]
     if algorithm == "DLS":
         depth_limited_search(cities, start_city, end_city)
     elif algorithm == "A*":
         a_star(cities, start_city, end_city)
     elif algorithm == "Greedy Search":
-        greedy_search(cities, start_city, end_city)
+        greedy_search(cities, start_city, end_city, getHeuristic(start_city, end_city))
     elif algorithm == "Uniform Cost":
-        uniform_cost(cities, start_city, end_city)
+        uniform_cost(cities, start_city, end_city, getHeuristic(start_city, end_city))
 
 def select_map_file():
     global selectedFile
