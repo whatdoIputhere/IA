@@ -19,7 +19,7 @@ This project is a route finder. It uses different algorithms to find the optimal
 The application supports the following algorithms for finding the route:
 
 - Uniform Cost Search
-- Depth First Search (DFS)
+- Depth-Limited Search (DLS)
 - Greedy Search
 - A* Search
 

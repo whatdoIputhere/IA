@@ -3,3 +3,4 @@ tkintermapview
 haversine
 geopy
 pandas
+openpyxl
