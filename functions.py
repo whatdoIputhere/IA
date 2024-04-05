@@ -127,7 +127,7 @@ def getGeolocation(location, cached_locations, country=""):
         file.write(f"{location},{geolocation.latitude},{geolocation.longitude}\n")
     return [geolocation.latitude, geolocation.longitude]
 
-def getHeuristic(start_city,end_city):   
+def h(start_city,end_city):   
     if(end_city.getName() == "Faro"):
         return start_city.getStraightDistanceToFaro()
-    return hs.haversine(start_city.getLocation(), end_city.getLocation())
+    return int(hs.haversine(start_city.getLocation(), end_city.getLocation()))

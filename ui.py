@@ -32,9 +32,9 @@ def handle_calculate_route():
     elif algorithm == "A*":
         a_star(cities, start_city, end_city)
     elif algorithm == "Greedy Search":
-        greedy_search(cities, start_city, end_city, getHeuristic(start_city, end_city))
+        greedy_search(cities, start_city, end_city)
     elif algorithm == "Uniform Cost":
-        uniform_cost(cities, start_city, end_city, getHeuristic(start_city, end_city))
+        uniform_cost(cities, start_city, end_city)
 
 def select_map_file():
     global selectedFile
