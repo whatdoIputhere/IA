@@ -9,7 +9,7 @@ cached_locations = loadCachedLocations()
 selectedFile = None
 cities = ()
 city_names = ()
-algorithms = ['DFS','A*','Greedy Search', 'Uniform Cost']
+algorithms = ['DLS','A*','Greedy Search', 'Uniform Cost']
 
 root = Tk()
 window_width , window_height = 1280, 720
@@ -26,7 +26,7 @@ def handle_calculate_route():
     end_city = end_city_combobox.get()
     algorithm = algorithm_combobox.get()
 
-    if algorithm == "Depth-Limited Search":
+    if algorithm == "DLS":
         depth_limited_search(cities, start_city, end_city)
     elif algorithm == "A*":
         a_star(cities, start_city, end_city)
