@@ -9,7 +9,7 @@ def is_installed(package):
         return False
 
 def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", package])
 
 def install_requirements():
     with open('requirements.txt', 'r') as f:
