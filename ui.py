@@ -28,13 +28,13 @@ def handle_calculate_route():
     start_city = [city for city in cities if city.getName() == start_city][0]
     end_city = [city for city in cities if city.getName() == end_city][0]
     if algorithm == "DLS":
-        depth_limited_search(cities, start_city, end_city)
+        displayCalculatedPath(depth_limited_search(cities, start_city, end_city))
     elif algorithm == "A*":
-        a_star(cities, start_city, end_city)
+        displayCalculatedPath(a_star(cities, start_city, end_city))
     elif algorithm == "Greedy Search":
-        greedy_search(cities, start_city, end_city)
+        displayCalculatedPath(greedy_search(cities, start_city, end_city))
     elif algorithm == "Uniform Cost":
-        uniform_cost(cities, start_city, end_city)
+        displayCalculatedPath(uniform_cost(cities, start_city, end_city))
 
 def select_map_file():
     global selectedFile
@@ -89,7 +89,17 @@ def addMarkersToAllLocations():
     for city in city_names:
         location = getGeolocation(city,cached_locations)
         map_view.set_marker(location[0], location[1], city)
-
+        
+def displayCalculatedPath(pathCost):
+    path = pathCost[0]
+    cost = pathCost[1]
+    for city in path:
+        location = getGeolocation(city, cached_locations)
+        map_view.set_marker(location[0], location[1], city)
+        if(city != path[0]):
+            map_view.set_path([(previousCityLocation[0], previousCityLocation[1]), (location[0], location[1])])
+        previousCityLocation = location
+    
 def addPathsToMap():
     map_view.delete_all_path()
     addMarkersToAllLocations()
@@ -126,8 +136,11 @@ calculate_route_button = Button(left_frame, text="Calculate Route",
                                 command=lambda: handle_calculate_route())
 calculate_route_button.pack(pady=(10,0))
 
-add_markers_and_distances_button = Button(left_frame, text="Add Markers and Distances", command=lambda: addPathsToMap())
+add_markers_and_distances_button = Button(left_frame, text="Add Markers and Paths", command=lambda: addPathsToMap())
 add_markers_and_distances_button.pack(pady=(10,0))
+
+clear_markers_and_distances_button = Button(left_frame, text="Clear Markers", command=lambda: clearMarkersAndPaths())
+clear_markers_and_distances_button.pack(pady=(10,0))
 
 select_map_message = Label(text="Select a file to load the map.", font=("Arial", 16),foreground="#666",background="#DDD")
 select_map_message.pack()
