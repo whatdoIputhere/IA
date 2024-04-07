@@ -15,7 +15,7 @@ def depth_limited_search(cities, start_city, end_city, depth_limit, current_dept
         if city is None:
             continue
         if city.getName() == end_city.getName():
-            distance += int(connection["distance"])  # Make sure distance is an integer
+            distance += int(connection["distance"])
             print("Path found:", path + [end_city.getName()])
             print("Distance:", distance)
             return path + [end_city.getName()], distance
