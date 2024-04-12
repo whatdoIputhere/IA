@@ -2,5 +2,5 @@ tk
 tkintermapview
 haversine
 geopy
-pandas
 openpyxl
+pandas

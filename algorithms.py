@@ -1,7 +1,8 @@
 from functions import * 
 
-def uniform_cost_algorithm(cities, start_city, end_city, path = [], cost = [], heuristic_value = 0):
+def uniform_cost_algorithm(needs_heuristic_value, cities, start_city, end_city, path = [], path_cost = [], heuristic_value = 0):
     min_distance = 99999
+    cost_value = 0
     next_city = None
     
     path.append(start_city.getName())
@@ -9,20 +10,21 @@ def uniform_cost_algorithm(cities, start_city, end_city, path = [], cost = [], h
         city = [city for city in cities if city.getName() == connection["name"]][0]
         if city.getName() == end_city.getName():
             path.append(city.getName())
-            cost.append(connection["distance"])
-            result = (path.copy(), cost.copy()) 
-            cost.clear()
+            path_cost.append(int(connection["distance"]))
+            result = (path.copy(), path_cost.copy()) 
+            path_cost.clear()
             path.clear()
             return result
         
         if int(connection["distance"]) < min_distance:
             min_distance = int(connection["distance"]) + int(heuristic_value)
+            cost_value = int(connection["distance"])
             next_city = city
 
-    cost.append(min_distance)
+    path_cost.append(cost_value)
             
     try:
-        return uniform_cost_algorithm(cities, next_city, end_city, path, cost)
+        return uniform_cost_algorithm(needs_heuristic_value, cities, next_city, end_city, path, path_cost, next_city.getStraightDistanceToFaro() if needs_heuristic_value else 0)
     except Exception as e:
         print(e)
         return [], []
@@ -31,7 +33,7 @@ def uniform_cost_algorithm(cities, start_city, end_city, path = [], cost = [], h
 def uniform_cost(cities, start_city, end_city):
     print("Uniform Cost Search")
     
-    return uniform_cost_algorithm(cities, start_city, end_city)
+    return uniform_cost_algorithm(False, cities, start_city, end_city)
     
     
 def depth_limited_search(cities, start_city, end_city, depth_limit, current_depth=0, path=[], path_cost=[]):
@@ -91,4 +93,4 @@ def greedy_search(cities, start_city, end_city, greedypath = [], greedycost = []
         return [], []
 
 def a_star(cities, start_city, end_city):
-    return uniform_cost_algorithm(cities, start_city, end_city, heuristic_value = start_city.getStraightDistanceToFaro())
+    return uniform_cost_algorithm(True, cities, start_city, end_city, heuristic_value = start_city.getStraightDistanceToFaro())
