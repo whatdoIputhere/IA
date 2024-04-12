@@ -5,6 +5,8 @@ from tkinter import filedialog
 import tkinter.ttk as ttk
 from algorithms import *
 
+DEPT_LIMIT = 3
+
 cached_locations = loadCachedLocations()
 selectedFile = None
 cities = ()
@@ -24,13 +26,14 @@ left_frame = Frame(root, width=200)
 left_frame.pack(side=LEFT, fill=Y, ipadx=15)
 
 def handle_calculate_route():
+    path_list.delete(0, END)
     start_city = start_city_combobox.get()
     end_city = end_city_combobox.get()
     algorithm = algorithm_combobox.get()
     start_city = [city for city in cities if city.getName() == start_city][0]
     end_city = [city for city in cities if city.getName() == end_city][0]
     if algorithm == "DLS":
-        displayCalculatedPath(depth_limited_search(cities, start_city, end_city))
+        displayCalculatedPath(depth_limited_search(cities, start_city, end_city, DEPT_LIMIT))
     elif algorithm == "A*":
         displayCalculatedPath(a_star(cities, start_city, end_city))
     elif algorithm == "Greedy Search":
@@ -86,6 +89,7 @@ def populateCities(event=None):
             start_city_combobox['values'] = [city for city in city_names if city != end_city_combobox.get()]
 
 def clearMarkersAndPaths():
+    path_list.delete(0, END)
     map_view.delete_all_marker()
     map_view.delete_all_path()
 
@@ -100,8 +104,13 @@ def displayCalculatedPath(pathCost):
     path_list.option_clear()
     path = pathCost[0]
     cost = pathCost[1]
+    cost.insert(0, 0)
+    print(pathCost)
+    total_cost = sum(map(int, cost))
+    print(f"Total Cost: {total_cost}")
     for city in path:
-        path_list.insert(END, city)
+        spaces = " " * (40 - len(city))
+        path_list.insert(END, f"{city}{spaces}{cost[path.index(city)]}")
         location = getGeolocation(city, cached_locations)
         map_view.set_marker(location[0], location[1], city)
         if(city != path[0]):
