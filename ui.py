@@ -110,7 +110,7 @@ def displayCalculatedPath(pathCost):
     print(f"Total Cost: {total_cost}")
     for city in path:
         spaces = " " * (40 - len(city))
-        path_list.insert(END, f"{city}{spaces}{cost[path.index(city)]}")
+        path_list.insert(END, f"{city}{spaces}{sum(map(int, cost[:path.index(city)+1]))}")
         location = getGeolocation(city, cached_locations)
         map_view.set_marker(location[0], location[1], city)
         if(city != path[0]):
