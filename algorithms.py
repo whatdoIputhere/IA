@@ -6,41 +6,52 @@ def uniform_cost_algorithm(cities, start_city, end_city, heuristic_value=0):
     paths = []
     path_cost = []  # path cost without heuristic
     path_cost_total = []  # includes heuristic
-    path_with_lowest_cost = {}
+    lowest_cost_path = {}
+    latest_lowest_cost_path = {}
+    is_first_iteration = True
 
-    paths.append({"path": [start_city.getName()], "cost": 0})
     while not stop:
         for connection in start_city.getConnections():
             city = [city for city in cities if city.getName() ==
                     connection["name"]][0]
-            
+
             if city.getName() == end_city.getName():
                 print("end")
                 return [], []
 
             aux_path = []
-            if path_with_lowest_cost == {}:
-                aux_path.append(connection["name"])
-                aux_cost = int(connection["distance"])
+            aux_cost = 0
+            if paths == [] or is_first_iteration:
+                aux_path.append(start_city.getName())
+                aux_path.append(city.getName())
+                aux_cost = int(connection["distance"]) + int(heuristic_value)
             else:
-                for city in path_with_lowest_cost["path"]:
-                    aux_path.append(", ".join(city).rstrip(", "))
-                aux_cost = int(path_with_lowest_cost["cost"])
-                path_with_lowest_cost = {}
+                for path in paths:
+                    aux_path = path["path"].copy()
+                    aux_cost = path["cost"]
+                aux_path.append(city.getName())
+                aux_cost += int(connection["distance"]) + int(heuristic_value)
 
-            aux_path.append(city.getName())
-            paths.append({"path": aux_path, "cost": aux_cost + int(
-                connection["distance"]) + int(heuristic_value)})
+            paths.append({"path": aux_path, "cost": aux_cost})
 
-            for path in paths:
-                if path_with_lowest_cost == {}:
-                    path_with_lowest_cost = paths.pop(paths.index(path))
-                elif path["cost"] < path_with_lowest_cost["cost"]:
-                    path_with_lowest_cost = paths.pop(paths.index(path))
+        if is_first_iteration:
+            is_first_iteration = False
 
-            start_city = city
+        print(paths)
+        for path in paths:
+            if lowest_cost_path == {} or path["cost"] < lowest_cost_path["cost"]:
+                lowest_cost_path = path
 
-            print(paths)
+        print(lowest_cost_path["path"][-1])
+        if lowest_cost_path != latest_lowest_cost_path or latest_lowest_cost_path == {}:
+            latest_lowest_cost_path = lowest_cost_path
+
+            paths.remove(lowest_cost_path)
+
+            next_city = [city for city in cities if city.getName()
+                         == lowest_cost_path["path"][-1]][0]
+
+            start_city = next_city
 
     return [], []
 
