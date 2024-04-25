@@ -2,13 +2,12 @@ from functions import *
 
 
 def uniform_cost_algorithm(cities, start_city, end_city, isFromAStar=False):
-    stop = False
     paths = []
     lowest_cost_path = {}
     latest_lowest_cost_path = {}
     is_first_iteration = True
 
-    while not stop:
+    while True:
         for connection in start_city.getConnections():
             city = [city for city in cities if city.getName() ==
                     connection["name"]][0]
