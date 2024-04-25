@@ -1,11 +1,9 @@
 from functions import *
 
 
-def uniform_cost_algorithm(cities, start_city, end_city, heuristic_value=0):
+def uniform_cost_algorithm(cities, start_city, end_city, isFromAStar=False):
     stop = False
     paths = []
-    path_cost = []  # path cost without heuristic
-    path_cost_total = []  # includes heuristic
     lowest_cost_path = {}
     latest_lowest_cost_path = {}
     is_first_iteration = True
@@ -15,41 +13,36 @@ def uniform_cost_algorithm(cities, start_city, end_city, heuristic_value=0):
             city = [city for city in cities if city.getName() ==
                     connection["name"]][0]
 
-            if city.getName() == end_city.getName():
-                print("end")
-                return [], []
-
-            aux_path = []
-            aux_cost = 0
+            aux_paths = []
+            aux_costs = []
+            aux_total_cost = 0
             if paths == [] or is_first_iteration:
-                aux_path.append(start_city.getName())
-                aux_path.append(city.getName())
-                aux_cost = int(connection["distance"]) + int(heuristic_value)
+                aux_paths.append(start_city.getName())
             else:
-                for path in paths:
-                    aux_path = path["path"].copy()
-                    aux_cost = path["cost"]
-                aux_path.append(city.getName())
-                aux_cost += int(connection["distance"]) + int(heuristic_value)
+                aux_paths = lowest_cost_path["paths"].copy()
+                aux_costs = lowest_cost_path["costs"].copy()
+                aux_total_cost = lowest_cost_path["total_cost"]
+            aux_paths.append(city.getName())
+            aux_costs.append(int(connection["distance"]))
+            aux_total_cost += int(connection["distance"]) + (
+                int(city.getStraightDistanceToFaro()) if isFromAStar else 0)
 
-            paths.append({"path": aux_path, "cost": aux_cost})
+            paths.append({"paths": aux_paths, "costs": aux_costs,
+                         "total_cost": aux_total_cost})
+
+            if city.getName() == end_city.getName():
+                return (paths[-1]["paths"].copy(), paths[-1]["costs"].copy())
 
         if is_first_iteration:
             is_first_iteration = False
 
-        print(paths)
-        for path in paths:
-            if lowest_cost_path == {} or path["cost"] < lowest_cost_path["cost"]:
-                lowest_cost_path = path
-
-        print(lowest_cost_path["path"][-1])
+        lowest_cost_path = min(paths, key=lambda path: path["total_cost"])
         if lowest_cost_path != latest_lowest_cost_path or latest_lowest_cost_path == {}:
             latest_lowest_cost_path = lowest_cost_path
 
-            paths.remove(lowest_cost_path)
-
             next_city = [city for city in cities if city.getName()
-                         == lowest_cost_path["path"][-1]][0]
+                         == lowest_cost_path["paths"][-1]][0]
+            paths.remove(lowest_cost_path)
 
             start_city = next_city
 
@@ -74,7 +67,6 @@ def depth_limited_search(cities, start_city, end_city, depth_limit, current_dept
         if city is None:
             continue
         if city.getName() == end_city.getName():
-
             path.append(city.getName())
             path_cost.append(connection["distance"])
             result = (path.copy(), path_cost.copy())
@@ -122,4 +114,4 @@ def greedy_search(cities, start_city, end_city, greedypath=[], greedycost=[]):
 
 
 def a_star(cities, start_city, end_city):
-    return uniform_cost_algorithm(cities, start_city, end_city, heuristic_value=start_city.getStraightDistanceToFaro())
+    return uniform_cost_algorithm(cities, start_city, end_city, isFromAStar=True)
