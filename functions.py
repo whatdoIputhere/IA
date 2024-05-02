@@ -155,5 +155,5 @@ def getGeolocation(location, cached_locations, country=""):
 
 def h(start_city, end_city):
     if (end_city.getName() == "Faro"):
-        return start_city.getStraightDistanceToFaro()
+        return int(start_city.getStraightDistanceToFaro())
     return int(hs.haversine(start_city.getLocation(), end_city.getLocation()))
