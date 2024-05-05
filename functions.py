@@ -60,7 +60,7 @@ def parseTextFile(file, cached_locations):
                             cities[index].addConnection(
                                 {"name": cityName, "distance": connection_distance})
 
-    with open("maps/distancetofaro.txt", "r", encoding="utf-8") as file:
+    with open("adittional_files/distancetofaro.txt", "r", encoding="utf-8") as file:
         lines = file.readlines()
         for line in lines:
             cityname, distance = line.split(',')
@@ -126,8 +126,8 @@ def parseExcelFile(file, cached_locations):
 
 def loadCachedLocations():
     cached_locations = []
-    open("cached_locations.txt", "a").close()
-    with open("cached_locations.txt", "r", encoding="utf-8") as file:
+    open("adittional_files/cached_locations.txt", "a").close()
+    with open("adittional_files/cached_locations.txt", "r", encoding="utf-8") as file:
         for line in file:
             location, latitude, longitude = line.split(',')
             cached_locations.append({"location": location, "latitude": float(
@@ -147,7 +147,7 @@ def getGeolocation(location, cached_locations, country=""):
         location + ", " + country if country != "" else location)
     cached_locations.append(
         {"location": location, "latitude": geolocation.latitude, "longitude": geolocation.longitude})
-    with open("cached_locations.txt", "a", encoding="utf-8") as file:
+    with open("adittional_files/cached_locations.txt", "a", encoding="utf-8") as file:
         file.write(
             f"{location},{geolocation.latitude},{geolocation.longitude}\n")
     return [geolocation.latitude, geolocation.longitude]

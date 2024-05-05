@@ -12,7 +12,7 @@ def install(package):
     subprocess.check_call([sys.executable, "-m", "pip", "install", "--user", package])
 
 def install_requirements():
-    with open('requirements.txt', 'r') as f:
+    with open('adittional_files/requirements.txt', 'r') as f:
         for line in f:
             package = line.strip()
             if not is_installed(package):
