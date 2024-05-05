@@ -39,4 +39,6 @@ The application supports the following algorithms for finding the route:
   
 - `installrequirements.py`: Checks if the necessary Python packages are installed. If not, it installs them.
 
-- `maps`: This folder contains .txt .xlsx and .csv files with a list of cities and their connections.
+- `maps\`: This folder contains .txt .xlsx and .csv files with a list of cities and their connections.
+
+- `adittional_files\`: This folder contains other .txt files relevant to the project
